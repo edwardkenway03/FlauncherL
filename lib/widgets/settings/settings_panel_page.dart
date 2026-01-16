@@ -29,7 +29,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
-import 'package:tuple/tuple.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../rounded_switch_list_tile.dart';
@@ -276,13 +275,13 @@ class SettingsPanelPage extends StatelessWidget {
   Future<void> _dateTimeFormatDialog(BuildContext context) async {
     SettingsService service = context.read<SettingsService>();
 
-    final formatTuple = await showDialog<Tuple2<String, String>>(
+    final formatRecord = await showDialog<(String, String)>(
         context: context,
         builder: (_) => DateTimeFormatDialog(service.dateFormat, service.timeFormat)
     );
 
-    if (formatTuple != null) {
-      await service.setDateTimeFormat(formatTuple.item1, formatTuple.item2);
+    if (formatRecord != null) {
+      await service.setDateTimeFormat(formatRecord.$1, formatRecord.$2);
     }
   }
 

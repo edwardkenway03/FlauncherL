@@ -39,16 +39,9 @@ class DailyWifiUsageWidget extends StatelessWidget {
             final usage = snapshot.data ?? networkService.dailyWifiUsage;
             final usageString = _formatBytes(usage);
 
-            return Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.wifi, size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  "$label: $usageString",
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ],
+            return Text(
+              "$label: $usageString",
+              style: Theme.of(context).textTheme.titleMedium,
             );
           },
         );

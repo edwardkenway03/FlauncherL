@@ -19,59 +19,29 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:format/format.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
-import 'package:tuple/tuple.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-// TODO: Translate these
-const List<Tuple2<String, String>> dateFormatSpecifiers = [
-  Tuple2("d", "[d] Day in month (10)"),
-  Tuple2("E", "[E] Abbreviated day of week (Tue)"),
-  Tuple2("EEEE", "[EEEE] Day of week (Tuesday)"),
-  Tuple2("D", "[D] Day in year (189)"),
-  // Tuple2("c", "Standalone day", "10"),
-  Tuple2("M", "[M] Month in year (07)"),
-  Tuple2("MMM", "[MMM] Abbreviated month in year (Jul)"),
-  Tuple2("MMMM", "[MMMM] Month in year (July)"),
-  // Tuple2("L", "Standalone month", "07 or July"),
-  Tuple2("y", "[y] Year (1996)"),
+// Date format presets
+const List<(String format, String example)> dateFormatPresets = [
+  ('EEEE d', 'Friday 17'),
+  ('E d', 'Fri 17'),
+  ('dd/MM/y', '17/01/2026'),
+  ('MMM d, y', 'Jan 17, 2026'),
+  ('d MMMM', '17 January'),
+  ('M/d/y', '1/17/2026'),
 ];
 
-const List<Tuple2<String, String>> timeFormatSpecifiers = [
-  Tuple2("h", "[h] Hour in am/pm (1~12)"),
-  Tuple2("H", "[H] Hour in day (0~23)"),
-  Tuple2("m", "[m] Minute in hour (30)"),
-  Tuple2("s", "[s] Second in minute (55)"),
-  Tuple2("a", "[a] am/pm marker (PM)"),
-  Tuple2("k", "[k] Hour in day (1~24)"),
-  Tuple2("K", "[K] Hour in am/pm (0~11)")
+// Time format presets
+const List<(String format, String example)> timeFormatPresets = [
+  ('H:mm', '1:43'),
+  ('HH:mm', '01:43'),
+  ('h:mm a', '1:43 AM'),
+  ('hh:mm a', '01:43 AM'),
+  ('H:mm:ss', '1:43:30'),
 ];
 
-class FormatModel extends ChangeNotifier {
-  String _dateFormatString;
-  String _timeFormatString;
-
-  String get dateFormatString => _dateFormatString;
-  String get timeFormatString => _timeFormatString;
-
-  FormatModel(String dateFormatString, String timeFormatString) :
-        _dateFormatString = dateFormatString,
-        _timeFormatString = timeFormatString;
-
-  void setDateFormatString(String newFormatString) {
-    _dateFormatString = newFormatString;
-    notifyListeners();
-  }
-
-  void setTimeFormatString(String newFormatString) {
-    _timeFormatString = newFormatString;
-    notifyListeners();
-  }
-}
-
-class DateTimeFormatDialog extends StatelessWidget {
+class DateTimeFormatDialog extends StatefulWidget {
   final String _initialDateFormat;
   final String _initialTimeFormat;
 
@@ -80,149 +50,120 @@ class DateTimeFormatDialog extends StatelessWidget {
         _initialTimeFormat = initialTimeFormat;
 
   @override
+  State<DateTimeFormatDialog> createState() => _DateTimeFormatDialogState();
+}
+
+class _DateTimeFormatDialogState extends State<DateTimeFormatDialog> {
+  late String _selectedDateFormat;
+  late String _selectedTimeFormat;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedDateFormat = widget._initialDateFormat;
+    _selectedTimeFormat = widget._initialTimeFormat;
+  }
+
+  @override
   Widget build(BuildContext context) {
     AppLocalizations localizations = AppLocalizations.of(context)!;
 
-    TextEditingController dateFormatFieldController = TextEditingController(
-        text: _initialDateFormat);
-    TextEditingController timeFormatFieldController = TextEditingController(
-        text: _initialTimeFormat);
-
-    List<DropdownMenuEntry<String>> menuEntries = [];
-
-    Iterable<Tuple2<String, String>> formatSpecifiers =
-      dateFormatSpecifiers.followedBy(timeFormatSpecifiers);
-    for (Tuple2<String, String> tuple in formatSpecifiers) {
-      menuEntries.add(DropdownMenuEntry(value: tuple.item1, label: tuple.item2));
-    }
-
-    return ChangeNotifierProvider(
-      create: (_) => FormatModel(_initialDateFormat, _initialTimeFormat),
-      builder: (context, _) => SimpleDialog(
-        insetPadding: const EdgeInsets.only(bottom: 60),
-        contentPadding: const EdgeInsets.all(24),
-        title: Text(localizations.dateAndTimeFormat),
-        children: [
-          Consumer<FormatModel>(
-            builder: (_, model, __) {
-              String text;
-
-              if (model.dateFormatString.isEmpty) {
-                text = localizations.noDateFormatSpecified;
-              }
-              else {
-                DateFormat dateFormat = DateFormat(
-                    model.dateFormatString, Platform.localeName);
-                text = localizations.formattedDate(dateFormat.format(DateTime.now()));
-              }
-
-              if (model.timeFormatString.isEmpty) {
-                text += "\n${localizations.noTimeFormatSpecified}";
-              }
-              else {
-                DateFormat dateFormat = DateFormat(
-                    model.timeFormatString, Platform.localeName);
-                text += "\n${localizations.formattedTime(dateFormat.format(DateTime.now()))}";
-              }
-
-              return Text(text);
-            }
+    return SimpleDialog(
+      insetPadding: const EdgeInsets.only(bottom: 60),
+      contentPadding: const EdgeInsets.all(24),
+      title: Text(localizations.dateAndTimeFormat),
+      children: [
+        // Live preview
+        _buildPreview(),
+        
+        const SizedBox(height: 24),
+        const Divider(),
+        
+        // Date format section
+        Text(
+          localizations.date,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        
+        ...dateFormatPresets.map((preset) => RadioListTile<String>(
+          dense: true,
+          title: Text(preset.$2),  // Example display
+          subtitle: Text(preset.$1, style: TextStyle(fontSize: 12, color: Colors.grey)),
+          value: preset.$1,
+          groupValue: _selectedDateFormat,
+          onChanged: (value) {
+            setState(() => _selectedDateFormat = value!);
+          },
+        )),
+        
+        const SizedBox(height: 16),
+        const Divider(),
+        
+        // Time format section
+        Text(
+          localizations.time,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        
+        ...timeFormatPresets.map((preset) => RadioListTile<String>(
+          dense: true,
+          title: Text(preset.$2),
+          subtitle: Text(preset.$1, style: TextStyle(fontSize: 12, color: Colors.grey)),
+          value: preset.$1,
+          groupValue: _selectedTimeFormat,
+          onChanged: (value) {
+            setState(() => _selectedTimeFormat = value!);
+          },
+        )),
+        
+        const SizedBox(height: 24),
+        
+        // OK button
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton(
+            autofocus: true,
+            onPressed: () {
+              Navigator.pop(context, (_selectedDateFormat, _selectedTimeFormat));
+            },
+            child: const Text('OK'),
           ),
-          const SizedBox(height: 24),
-          TextFormField(
-            autovalidateMode: AutovalidateMode.always,
-            controller: dateFormatFieldController,
-            decoration: InputDecoration(labelText: localizations.typeInTheDateFormat),
-            keyboardType: TextInputType.text,
-            onChanged: (value) => dateFormatStringChanged(context, value),
-            onFieldSubmitted: (value) {
-              returnFromDialog(context, value, timeFormatFieldController.text);
-            },
-            validator: (value) {
-              String? result;
-
-              if (value != null) {
-                value = value.trim();
-
-                if (value.isEmpty) {
-                  result = localizations.mustNotBeEmpty;
-                }
-              }
-
-              return result;
-            },
-          ),
-          TextFormField(
-            autovalidateMode: AutovalidateMode.always,
-            controller: timeFormatFieldController,
-            decoration: InputDecoration(labelText: localizations.typeInTheHourFormat),
-            keyboardType: TextInputType.text,
-            onChanged: (value) => timeFormatStringChanged(context, value),
-            onFieldSubmitted: (value) {
-              returnFromDialog(context, dateFormatFieldController.text, value);
-            },
-            validator: (value) {
-              String? result;
-
-              if (value != null) {
-                value = value.trim();
-
-                if (value.isEmpty) {
-                  result = localizations.mustNotBeEmpty;
-                }
-              }
-
-              return result;
-            },
-          ),
-          const SizedBox(height: 24),
-          Text(localizations.orSelectFormatSpecifiers),
-          const SizedBox(height: 12),
-          DropdownMenu<String>(
-              dropdownMenuEntries: menuEntries,
-              onSelected: (selectedValue) {
-                if (selectedValue != null) {
-                  bool isTimeFormat = false;
-
-                  for (Tuple2<String, String> tuple in timeFormatSpecifiers) {
-                    if (tuple.item1 == selectedValue) {
-                      isTimeFormat = true;
-                      break;
-                    }
-                  }
-
-                  if (isTimeFormat) {
-                    timeFormatFieldController.text += selectedValue;
-                    timeFormatStringChanged(context, timeFormatFieldController.text);
-                  }
-                  else {
-                    dateFormatFieldController.text += selectedValue;
-                    dateFormatStringChanged(context, dateFormatFieldController.text);
-                  }
-                }
-              }
-          )
-        ],
-      )
+        ),
+      ],
     );
   }
 
-  void dateFormatStringChanged(BuildContext context, String formatString) {
-    FormatModel model = Provider.of<FormatModel>(context, listen: false);
-    model.setDateFormatString(formatString);
-  }
+  Widget _buildPreview() {
+    final now = DateTime.now();
+    String preview = '';
 
-  void timeFormatStringChanged(BuildContext context, String formatString) {
-    FormatModel model = Provider.of<FormatModel>(context, listen: false);
-    model.setTimeFormatString(formatString);
-  }
-
-  void returnFromDialog(BuildContext context, String dateFormatString, String timeFormatString) {
-    dateFormatString = dateFormatString.trim();
-    timeFormatString = timeFormatString.trim();
-
-    if (dateFormatString.isNotEmpty && timeFormatString.isNotEmpty) {
-      Navigator.pop(context, Tuple2(dateFormatString, timeFormatString));
+    try {
+      if (_selectedDateFormat.isNotEmpty) {
+        preview = DateFormat(_selectedDateFormat, Platform.localeName).format(now);
+      }
+      if (_selectedTimeFormat.isNotEmpty) {
+        if (preview.isNotEmpty) preview += ' — ';
+        preview += DateFormat(_selectedTimeFormat, Platform.localeName).format(now);
+      }
+    } catch (e) {
+      preview = 'Invalid format';
     }
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.black26,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        preview.isEmpty ? 'Select formats below' : preview,
+        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.bold,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
   }
 }

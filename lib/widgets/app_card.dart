@@ -26,7 +26,6 @@ import 'package:flauncher/widgets/focus_keyboard_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:tuple/tuple.dart';
 
 import '../models/app.dart';
 import '../models/category.dart';
@@ -57,7 +56,7 @@ class AppCard extends StatefulWidget
 class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
   bool _moving = false;
 
-  late Future<Tuple2<AppImageType, ImageProvider>> _appImageLoadFuture;
+  late Future<(AppImageType, ImageProvider)> _appImageLoadFuture;
   late final AnimationController _animation = AnimationController(
     vsync: this,
     lowerBound: 0,
@@ -186,7 +185,7 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
       },
   );
 
-  Future<Tuple2<AppImageType, ImageProvider>> _loadAppBannerOrIcon(AppsService service) async {
+  Future<(AppImageType, ImageProvider)> _loadAppBannerOrIcon(AppsService service) async {
     Uint8List bytes = Uint8List(0);
 
     bytes = await service.getAppBanner(widget.application.packageName);
@@ -197,7 +196,7 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
       bytes = await service.getAppIcon(widget.application.packageName);
     }
 
-    return Tuple2(type, MemoryImage(bytes));
+    return (type, MemoryImage(bytes));
   }
 
   Widget _appImage()
@@ -208,10 +207,10 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
       future: _appImageLoadFuture,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          Tuple2<AppImageType, ImageProvider> tuple = snapshot.data!;
+          (AppImageType, ImageProvider) record = snapshot.data!;
 
-          if (tuple.item1 == AppImageType.Banner) {
-            return Ink.image(image: tuple.item2, fit: BoxFit.cover);
+          if (record.$1 == AppImageType.Banner) {
+            return Ink.image(image: record.$2, fit: BoxFit.cover);
           }
           else {
             return Padding(
@@ -221,7 +220,7 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
                   Expanded(
                     flex: 2,
                     child: Ink.image(
-                      image: tuple.item2,
+                      image: record.$2,
                       height: double.maxFinite,
                     ),
                   ),

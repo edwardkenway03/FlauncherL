@@ -53,6 +53,19 @@ class _DateTimeWidgetState extends State<DateTimeWidget> {
   }
 
   @override
+  void didUpdateWidget(DateTimeWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    
+    // Update format if it changed
+    if (oldWidget._dateTimeFormatString != widget._dateTimeFormatString) {
+      _dateFormat = DateFormat(widget._dateTimeFormatString, Platform.localeName);
+      setState(() {
+        _now = DateTime.now();
+      });
+    }
+  }
+
+  @override
   void dispose() {
     _timer.cancel();
     super.dispose();

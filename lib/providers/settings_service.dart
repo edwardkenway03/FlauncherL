@@ -34,6 +34,7 @@ const _showTimeInStatusBar = "show_time_in_status_bar";
 const _timeFormat = "time_format";
 const _wifiUsagePeriod = "wifi_usage_period";
 const _showWifiWidgetInStatusBar = "show_wifi_widget_in_status_bar";
+const _showNetworkIndicatorInStatusBar = "show_network_indicator_in_status_bar";
 
 // WiFi usage period options
 const String WIFI_USAGE_DAILY = "daily";
@@ -69,6 +70,8 @@ class SettingsService extends ChangeNotifier {
   String get wifiUsagePeriod => _sharedPreferences.getString(_wifiUsagePeriod) ?? WIFI_USAGE_DAILY;
 
   bool get showWifiWidgetInStatusBar => _sharedPreferences.getBool(_showWifiWidgetInStatusBar) ?? true;
+
+  bool get showNetworkIndicatorInStatusBar => _sharedPreferences.getBool(_showNetworkIndicatorInStatusBar) ?? true;
 
   SettingsService(
     this._sharedPreferences
@@ -128,5 +131,9 @@ class SettingsService extends ChangeNotifier {
 
   Future<void> setShowWifiWidgetInStatusBar(bool show) async {
     return set(_showWifiWidgetInStatusBar, show);
+  }
+
+  Future<void> setShowNetworkIndicatorInStatusBar(bool show) async {
+    return set(_showNetworkIndicatorInStatusBar, show);
   }
 }

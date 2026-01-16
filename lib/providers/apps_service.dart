@@ -24,7 +24,6 @@ import 'package:drift/drift.dart';
 import 'package:flauncher/database.dart';
 import 'package:flauncher/flauncher_channel.dart';
 import 'package:flutter/foundation.dart' hide Category;
-import 'package:tuple/tuple.dart';
 
 import '../models/app.dart';
 import '../models/category.dart';
@@ -166,9 +165,9 @@ class AppsService extends ChangeNotifier
     Future<List<Category>> categoriesFuture = _database.getCategories();
     Future<List<LauncherSpacer>> spacersFuture = _database.getLauncherSpacers();
     List<Map<dynamic, dynamic>> appsFromSystem = await _fLauncherChannel.getApplications();
-    Iterable<MapEntry<String, Tuple2<Map, AppsCompanion>>> appEntries = appsFromSystem.map(
-            (appFromSystem) => new MapEntry(appFromSystem['packageName'], Tuple2(appFromSystem, _buildAppCompanion(appFromSystem))));
-    Map<String, Tuple2<Map, AppsCompanion>> appsFromSystemByPackageName = Map.fromEntries(appEntries);
+    Iterable<MapEntry<String, (Map, AppsCompanion)>> appEntries = appsFromSystem.map(
+            (appFromSystem) => new MapEntry(appFromSystem['packageName'], (appFromSystem, _buildAppCompanion(appFromSystem))));
+    Map<String, (Map, AppsCompanion)> appsFromSystemByPackageName = Map.fromEntries(appEntries);
 
     List<App> appsFromDatabase = await appsFromDatabaseFuture;
     final Iterable<App> appsRemovedFromSystem = appsFromDatabase
@@ -186,7 +185,7 @@ class AppsService extends ChangeNotifier
     }
 
     await _database.transaction(() async {
-      await _database.persistApps(appsFromSystemByPackageName.values.map((tuple) => tuple.item2));
+      await _database.persistApps(appsFromSystemByPackageName.values.map((record) => record.$2));
       await _database.deleteApps(uninstalledApplications);
     });
 
@@ -208,7 +207,7 @@ class AppsService extends ChangeNotifier
     _launcherSections.sort((ls0, ls1) => ls0.order.compareTo(ls1.order));
 
     for (App application in _applications.values) {
-      Map? applicationFromSystem = appsFromSystemByPackageName[application.packageName]?.item1;
+      Map? applicationFromSystem = appsFromSystemByPackageName[application.packageName]?.$1;
 
       if (applicationFromSystem != null) {
         if (applicationFromSystem.containsKey('action')) {

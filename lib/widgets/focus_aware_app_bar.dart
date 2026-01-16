@@ -48,10 +48,21 @@ class _FocusAwareAppBarState extends State<FocusAwareAppBar>
       },
       child: AppBar(
         title: Selector<SettingsService, bool>(
-          selector: (context, service) => service.showWifiWidgetInStatusBar,
-          builder: (context, showWifi, _) => showWifi 
-            ? const DailyWifiUsageWidget() 
-            : const SizedBox.shrink(),
+          selector: (_, settings) => settings.showNetworkIndicatorInStatusBar,
+          builder: (context, showNetwork, _) => Selector<SettingsService, bool>(
+            selector: (_, settings) => settings.showWifiWidgetInStatusBar,
+            builder: (context, showWifi, _) => Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (showNetwork)
+                  const Padding(
+                    padding: EdgeInsets.only(right: 12),
+                    child: NetworkWidget(),
+                  ),
+                if (showWifi) const DailyWifiUsageWidget(),
+              ],
+            ),
+          ),
         ),
         actions: [
           IconButton(
@@ -66,10 +77,6 @@ class _FocusAwareAppBarState extends State<FocusAwareAppBar>
             onPressed: () => showDialog(context: context, builder: (_) => const SettingsPanel()),
             // sometime after Flutter 3.7.5, no later than 3.16.8, the focus highlight went away
             focusColor: Theme.of(context).primaryColorLight,
-          ),
-          const Padding(
-            padding: EdgeInsets.only(left: 16),
-            child: NetworkWidget(),
           ),
           Padding(
             padding: const EdgeInsets.only(left: 16, right: 32),
@@ -94,6 +101,7 @@ class _FocusAwareAppBarState extends State<FocusAwareAppBar>
                     if (dateTimeSettings.showDateInStatusBar)
                       Flexible(
                           child: DateTimeWidget(dateTimeSettings.dateFormat,
+                            key: const ValueKey('date'),  // Unique key for date widget
                             updateInterval: const Duration(minutes: 1),
                             textStyle: Theme.of(context).textTheme.titleLarge!.copyWith(
                               shadows: [
@@ -107,6 +115,7 @@ class _FocusAwareAppBarState extends State<FocusAwareAppBar>
                     if (dateTimeSettings.showTimeInStatusBar)
                       Flexible(
                         child: DateTimeWidget(dateTimeSettings.timeFormat,
+                          key: const ValueKey('time'),  // Unique key for time widget
                           textStyle: Theme.of(context).textTheme.titleLarge!.copyWith(
                             shadows: [
                               const Shadow(color: Colors.black54, offset: Offset(0, 2), blurRadius: 8)
