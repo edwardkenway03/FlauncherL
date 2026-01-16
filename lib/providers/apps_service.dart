@@ -38,6 +38,9 @@ class AppsService extends ChangeNotifier
 
   List<LauncherSection> _launcherSections = List.empty(growable: true);
   Map<String, App> _applications = Map();
+  Map<String, Uint8List> _iconCache = Map();
+  Map<String, Uint8List> _bannerCache = Map();
+
   Map<int, Category> _categoriesById = Map();
 
   bool get initialized => _initialized;
@@ -60,6 +63,18 @@ class AppsService extends ChangeNotifier
     }
 
     _fLauncherChannel.addAppsChangedListener((event) async {
+      String? changedPackageName;
+      if (event.containsKey('packageName')) {
+        changedPackageName = event['packageName'];
+      } else if (event.containsKey('activityInfo')) {
+         changedPackageName = event['activityInfo']['packageName'];
+      }
+
+      if (changedPackageName != null) {
+        _iconCache.remove(changedPackageName);
+        _bannerCache.remove(changedPackageName);
+      }
+
       switch (event["action"]) {
         case "PACKAGE_ADDED":
         case "PACKAGE_CHANGED":
@@ -76,6 +91,8 @@ class AppsService extends ChangeNotifier
           for (Map<dynamic, dynamic> applicationInfo in applicationsInfo) {
             App application = App.fromSystem(applicationInfo);
             _applications[application.packageName] = application;
+            _iconCache.remove(application.packageName);
+            _bannerCache.remove(application.packageName);
           }
           break;
         case "PACKAGE_REMOVED":
@@ -236,12 +253,26 @@ class AppsService extends ChangeNotifier
     }
   }
 
-  Future<Uint8List> getAppBanner(String packageName) {
-    return _fLauncherChannel.getApplicationBanner(packageName);
+  Future<Uint8List> getAppBanner(String packageName) async {
+    if (_bannerCache.containsKey(packageName)) {
+      return _bannerCache[packageName]!;
+    }
+    final bytes = await _fLauncherChannel.getApplicationBanner(packageName);
+    if (bytes.isNotEmpty) {
+      _bannerCache[packageName] = bytes;
+    }
+    return bytes;
   }
 
-  Future<Uint8List> getAppIcon(String packageName) {
-    return _fLauncherChannel.getApplicationIcon(packageName);
+  Future<Uint8List> getAppIcon(String packageName) async {
+    if (_iconCache.containsKey(packageName)) {
+      return _iconCache[packageName]!;
+    }
+    final bytes = await _fLauncherChannel.getApplicationIcon(packageName);
+    if (bytes.isNotEmpty) {
+      _iconCache[packageName] = bytes;
+    }
+    return bytes;
   }
 
   Future<void> launchApp(App app) {
