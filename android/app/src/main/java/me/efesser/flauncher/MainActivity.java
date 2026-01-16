@@ -26,12 +26,23 @@ import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
 import android.util.Pair;
 
 import androidx.annotation.NonNull;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.io.ByteArrayOutputStream;
+import android.app.usage.NetworkStats;
+import android.app.usage.NetworkStatsManager;
+import android.app.AppOpsManager;
+import android.os.RemoteException;
 
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.FlutterEngine;
@@ -52,22 +63,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class MainActivity extends FlutterActivity
-{
+public class MainActivity extends FlutterActivity {
     private final String METHOD_CHANNEL = "me.efesser.flauncher/method";
     private final String APPS_EVENT_CHANNEL = "me.efesser.flauncher/event_apps";
     private final String NETWORK_EVENT_CHANNEL = "me.efesser.flauncher/event_network";
 
     @Override
-    public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine)
-    {
+    public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
         super.configureFlutterEngine(flutterEngine);
 
         BinaryMessenger messenger = flutterEngine.getDartExecutor().getBinaryMessenger();
 
         new MethodChannel(messenger, METHOD_CHANNEL).setMethodCallHandler((call, result) -> {
-            switch (call.method)
-            {
+            switch (call.method) {
                 case "getApplications" -> result.success(getApplications());
                 case "getApplicationBanner" -> result.success(getApplicationBanner(call.arguments()));
                 case "getApplicationIcon" -> result.success(getApplicationIcon(call.arguments()));
@@ -75,12 +83,43 @@ public class MainActivity extends FlutterActivity
                 case "launchActivityFromAction" -> result.success(launchActivityFromAction(call.arguments()));
                 case "launchApp" -> result.success(launchApp(call.arguments()));
                 case "openSettings" -> result.success(openSettings());
+                case "openScreensaverSettings" -> result.success(openScreensaverSettings());
                 case "openAppInfo" -> result.success(openAppInfo(call.arguments()));
                 case "uninstallApp" -> result.success(uninstallApp(call.arguments()));
                 case "isDefaultLauncher" -> result.success(isDefaultLauncher());
                 case "checkForGetContentAvailability" -> result.success(checkForGetContentAvailability());
                 case "startAmbientMode" -> result.success(startAmbientMode());
                 case "getActiveNetworkInformation" -> result.success(getActiveNetworkInformation());
+                case "getDailyWifiUsage" -> {
+                    long usage = getDailyWifiUsage();
+                    if (usage == -1) {
+                        result.error("PERMISSION_DENIED", "Usage stats permission not granted", null);
+                    } else {
+                        result.success(usage);
+                    }
+                }
+                case "getWeeklyWifiUsage" -> {
+                    long usage = getWeeklyWifiUsage();
+                    if (usage == -1) {
+                        result.error("PERMISSION_DENIED", "Usage stats permission not granted", null);
+                    } else {
+                        result.success(usage);
+                    }
+                }
+                case "getMonthlyWifiUsage" -> {
+                    long usage = getMonthlyWifiUsage();
+                    if (usage == -1) {
+                        result.error("PERMISSION_DENIED", "Usage stats permission not granted", null);
+                    } else {
+                        result.success(usage);
+                    }
+                }
+                case "checkUsageStatsPermission" -> result.success(checkUsageStatsPermission());
+                case "requestUsageStatsPermission" -> {
+                    requestUsageStatsPermission();
+                    result.success(null);
+                }
+                case "openWifiSettings" -> result.success(openWifiSettings());
                 default -> throw new IllegalArgumentException();
             }
         });
@@ -94,12 +133,10 @@ public class MainActivity extends FlutterActivity
 
     private List<Map<String, Serializable>> getApplications() {
         ExecutorService executor = Executors.newFixedThreadPool(4);
-        CompletionService<Pair<Boolean, List<ResolveInfo>>> queryIntentActivitiesCompletionService =
-                new ExecutorCompletionService<>(executor);
-        queryIntentActivitiesCompletionService.submit(() ->
-                Pair.create(false, queryIntentActivities(false)));
-        queryIntentActivitiesCompletionService.submit(() ->
-                Pair.create(true, queryIntentActivities(true)));
+        CompletionService<Pair<Boolean, List<ResolveInfo>>> queryIntentActivitiesCompletionService = new ExecutorCompletionService<>(
+                executor);
+        queryIntentActivitiesCompletionService.submit(() -> Pair.create(false, queryIntentActivities(false)));
+        queryIntentActivitiesCompletionService.submit(() -> Pair.create(true, queryIntentActivities(true)));
         List<ResolveInfo> tvActivitiesInfo = null;
         List<ResolveInfo> nonTvActivitiesInfo = null;
 
@@ -110,12 +147,11 @@ public class MainActivity extends FlutterActivity
 
                 if (!activitiesInfo.first) {
                     tvActivitiesInfo = activitiesInfo.second;
-                }
-                else {
+                } else {
                     nonTvActivitiesInfo = activitiesInfo.second;
                 }
-            } catch (InterruptedException | ExecutionException ignored) { }
-            finally {
+            } catch (InterruptedException | ExecutionException ignored) {
+            } finally {
                 completed += 1;
             }
         }
@@ -212,7 +248,8 @@ public class MainActivity extends FlutterActivity
             if (drawable != null) {
                 imageBytes = drawableToByteArray(drawable);
             }
-        } catch (PackageManager.NameNotFoundException ignored) { }
+        } catch (PackageManager.NameNotFoundException ignored) {
+        }
 
         return imageBytes;
     }
@@ -228,7 +265,8 @@ public class MainActivity extends FlutterActivity
             if (drawable != null) {
                 imageBytes = drawableToByteArray(drawable);
             }
-        } catch (PackageManager.NameNotFoundException ignored) { }
+        } catch (PackageManager.NameNotFoundException ignored) {
+        }
 
         return imageBytes;
     }
@@ -254,13 +292,14 @@ public class MainActivity extends FlutterActivity
         String category;
         if (sideloaded) {
             category = Intent.CATEGORY_LAUNCHER;
-        }
-        else {
+        } else {
             category = Intent.CATEGORY_LEANBACK_LAUNCHER;
         }
 
-        // NOTE: Would be nice to query the applications that match *either* of the above categories
-        // but from the addCategory function documentation, it says that it will "use activities
+        // NOTE: Would be nice to query the applications that match *either* of the
+        // above categories
+        // but from the addCategory function documentation, it says that it will "use
+        // activities
         // that provide *all* the requested categories"
         Intent intent = new Intent(Intent.ACTION_MAIN)
                 .addCategory(category);
@@ -272,12 +311,12 @@ public class MainActivity extends FlutterActivity
     private Map<String, Serializable> buildAppMap(ActivityInfo activityInfo, boolean sideloaded, String action) {
         PackageManager packageManager = getPackageManager();
 
-        String  applicationName = activityInfo.loadLabel(packageManager).toString(),
+        String applicationName = activityInfo.loadLabel(packageManager).toString(),
                 applicationVersionName = "";
         try {
             applicationVersionName = packageManager.getPackageInfo(activityInfo.packageName, 0).versionName;
+        } catch (PackageManager.NameNotFoundException ignored) {
         }
-        catch (PackageManager.NameNotFoundException ignored) { }
 
         Map<String, Serializable> appMap = new HashMap<>();
         appMap.put("name", applicationName);
@@ -343,34 +382,29 @@ public class MainActivity extends FlutterActivity
         return false;
     }
 
-    private boolean startAmbientMode()
-    {
+    private boolean startAmbientMode() {
         Intent intent = new Intent(Intent.ACTION_MAIN)
                 .setClassName("com.android.systemui", "com.android.systemui.Somnambulator");
 
         return tryStartActivity(intent);
     }
 
-    private Map<String, Object> getActiveNetworkInformation()
-    {
+    private Map<String, Object> getActiveNetworkInformation() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             return NetworkUtils.getNetworkInformation(this, connectivityManager.getActiveNetwork());
-        }
-        else {
-            //noinspection deprecation
+        } else {
+            // noinspection deprecation
             return NetworkUtils.getNetworkInformation(this, connectivityManager.getActiveNetworkInfo());
         }
     }
 
-    private boolean tryStartActivity(Intent intent)
-    {
+    private boolean tryStartActivity(Intent intent) {
         boolean success = true;
 
         try {
             startActivity(intent);
-        }
-        catch (Exception ignored) {
+        } catch (Exception ignored) {
             success = false;
         }
 
@@ -385,8 +419,7 @@ public class MainActivity extends FlutterActivity
         Bitmap bitmap;
         if (drawable instanceof BitmapDrawable bitmapDrawable) {
             bitmap = bitmapDrawable.getBitmap();
-        }
-        else {
+        } else {
             bitmap = drawableToBitmap(drawable);
         }
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -405,4 +438,160 @@ public class MainActivity extends FlutterActivity
         drawable.draw(canvas);
         return bitmap;
     }
+
+    private long getDailyWifiUsage() {
+        if (!checkUsageStatsPermission()) {
+            return -1;
+        }
+
+        NetworkStatsManager networkStatsManager = (NetworkStatsManager) getSystemService(Context.NETWORK_STATS_SERVICE);
+        if (networkStatsManager == null)
+            return 0;
+
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
+        calendar.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        calendar.set(java.util.Calendar.MINUTE, 0);
+        calendar.set(java.util.Calendar.SECOND, 0);
+        calendar.set(java.util.Calendar.MILLISECOND, 0);
+        long startTime = calendar.getTimeInMillis();
+        long endTime = System.currentTimeMillis();
+
+        long totalBytes = 0;
+        try {
+            NetworkStats.Bucket bucket = networkStatsManager.querySummaryForDevice(
+                    NetworkCapabilities.TRANSPORT_WIFI,
+                    "",
+                    startTime,
+                    endTime);
+            totalBytes = bucket.getRxBytes() + bucket.getTxBytes();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        return totalBytes;
+    }
+
+    private long getWeeklyWifiUsage() {
+        if (!checkUsageStatsPermission()) {
+            return -1;
+        }
+
+        NetworkStatsManager networkStatsManager = (NetworkStatsManager) getSystemService(Context.NETWORK_STATS_SERVICE);
+        if (networkStatsManager == null)
+            return 0;
+
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
+        calendar.set(java.util.Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
+        calendar.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        calendar.set(java.util.Calendar.MINUTE, 0);
+        calendar.set(java.util.Calendar.SECOND, 0);
+        calendar.set(java.util.Calendar.MILLISECOND, 0);
+        long startTime = calendar.getTimeInMillis();
+        long endTime = System.currentTimeMillis();
+
+        long totalBytes = 0;
+        try {
+            NetworkStats.Bucket bucket = networkStatsManager.querySummaryForDevice(
+                    NetworkCapabilities.TRANSPORT_WIFI,
+                    "",
+                    startTime,
+                    endTime);
+            totalBytes = bucket.getRxBytes() + bucket.getTxBytes();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        return totalBytes;
+    }
+
+    private long getMonthlyWifiUsage() {
+        if (!checkUsageStatsPermission()) {
+            return -1;
+        }
+
+        NetworkStatsManager networkStatsManager = (NetworkStatsManager) getSystemService(Context.NETWORK_STATS_SERVICE);
+        if (networkStatsManager == null)
+            return 0;
+
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
+        calendar.set(java.util.Calendar.DAY_OF_MONTH, 1);
+        calendar.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        calendar.set(java.util.Calendar.MINUTE, 0);
+        calendar.set(java.util.Calendar.SECOND, 0);
+        calendar.set(java.util.Calendar.MILLISECOND, 0);
+        long startTime = calendar.getTimeInMillis();
+        long endTime = System.currentTimeMillis();
+
+        long totalBytes = 0;
+        try {
+            NetworkStats.Bucket bucket = networkStatsManager.querySummaryForDevice(
+                    NetworkCapabilities.TRANSPORT_WIFI,
+                    "",
+                    startTime,
+                    endTime);
+            totalBytes = bucket.getRxBytes() + bucket.getTxBytes();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        return totalBytes;
+    }
+
+    private boolean checkUsageStatsPermission() {
+        AppOpsManager appOps = (AppOpsManager) getSystemService(Context.APP_OPS_SERVICE);
+        int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
+                android.os.Process.myUid(), getPackageName());
+        return mode == AppOpsManager.MODE_ALLOWED;
+    }
+
+    private void requestUsageStatsPermission() {
+        Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+        tryStartActivity(intent);
+    }
+
+    private boolean openWifiSettings() {
+        // 1. Try Android Q+ WiFi panel
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            Intent panelIntent = new Intent(Settings.Panel.ACTION_WIFI);
+            if (tryStartActivity(panelIntent)) {
+                return true;
+            }
+        }
+
+        // 2. Try standard WiFi settings
+        Intent wifiIntent = new Intent(Settings.ACTION_WIFI_SETTINGS);
+        if (tryStartActivity(wifiIntent)) {
+            return true;
+        }
+
+        // 3. Fallback to general wireless settings
+        Intent wirelessIntent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
+        if (tryStartActivity(wirelessIntent)) {
+            return true;
+        }
+
+        // 4. Final fallback - open main settings
+        return launchActivityFromAction(Settings.ACTION_SETTINGS);
+    }
+
+    private boolean openScreensaverSettings() {
+        // 1. Try Android TV specific screensaver settings (DaydreamActivity - from
+        // Aerial Views)
+        Intent tvIntent = new Intent(Intent.ACTION_MAIN);
+        tvIntent.setClassName("com.android.tv.settings",
+                "com.android.tv.settings.device.display.daydream.DaydreamActivity");
+        if (tryStartActivity(tvIntent)) {
+            return true;
+        }
+
+        // 2. Try standard Android screensaver/dream settings
+        Intent dreamIntent = new Intent(Settings.ACTION_DREAM_SETTINGS);
+        if (tryStartActivity(dreamIntent)) {
+            return true;
+        }
+
+        // 3. Final fallback - open main settings
+        return launchActivityFromAction(Settings.ACTION_SETTINGS);
+    }
+
 }

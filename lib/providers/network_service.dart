@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:async';
 import 'package:flauncher/flauncher_channel.dart';
 import 'package:flutter/material.dart';
 
@@ -62,13 +63,18 @@ class NetworkService extends ChangeNotifier
   CellularNetworkType _cellularNetworkType;
   NetworkType         _networkType;
   int                 _wirelessNetworkSignalLevel;
+  int                 _dailyWifiUsage; // In bytes
+  bool                _hasUsageStatsPermission;
+  Timer?              _usageTimer;
 
 
   NetworkService(this._channel) :
         _hasInternetAccess = false,
         _cellularNetworkType = CellularNetworkType.Unknown,
         _networkType = NetworkType.Unknown,
-        _wirelessNetworkSignalLevel = 0
+        _wirelessNetworkSignalLevel = 0,
+        _dailyWifiUsage = 0,
+        _hasUsageStatsPermission = false
   {
     _channel.addNetworkChangedListener(_onNetworkChanged);
 
@@ -79,12 +85,79 @@ class NetworkService extends ChangeNotifier
             _getNetworkInformation(map);
           }
         });
+
+    _checkPermissionAndStartPolling();
+  }
+
+  void _checkPermissionAndStartPolling() async {
+    _hasUsageStatsPermission = await _channel.checkUsageStatsPermission();
+    if (_hasUsageStatsPermission) {
+      _fetchUsage();
+      _usageTimer = Timer.periodic(const Duration(minutes: 5), (_) => _fetchUsage());
+    }
+    notifyListeners();
+  }
+
+  Future<void> requestPermission() async {
+    await _channel.requestUsageStatsPermission();
+    // Wait a bit for user to return, or just rely on Lifecycle, but here we can't easily hook into lifecycle.
+    // We can assume if they clicked it, they might come back.
+    // Ideally we recheck when app resumes. For now let's just recheck after a delay or expose a method to recheck.
+  }
+
+  // Call this when app resumes
+  Future<void> refreshPermissionAndUsage() async {
+    _hasUsageStatsPermission = await _channel.checkUsageStatsPermission();
+    if (_hasUsageStatsPermission) {
+      _fetchUsage();
+      if (_usageTimer == null || !_usageTimer!.isActive) {
+         _usageTimer = Timer.periodic(const Duration(minutes: 5), (_) => _fetchUsage());
+      }
+    } else {
+      _usageTimer?.cancel();
+    }
+    notifyListeners();
+  }
+
+  Future<void> openWifiSettings() async {
+    await _channel.openWifiSettings();
+  }
+
+  Future<void> _fetchUsage() async {
+     // This will be called with the current period from the widget
+     // For now, default to daily
+     int usage = await _channel.getDailyWifiUsage();
+     if (usage != -1) {
+       _dailyWifiUsage = usage;
+       notifyListeners();
+     }
+  }
+
+  Future<int> getWifiUsageForPeriod(String period) async {
+    switch (period) {
+      case 'daily':
+        return await _channel.getDailyWifiUsage();
+      case 'weekly':
+        return await _channel.getWeeklyWifiUsage();
+      case 'monthly':
+        return await _channel.getMonthlyWifiUsage();
+      default:
+        return await _channel.getDailyWifiUsage();
+    }
+  }
+
+  @override
+  void dispose() {
+    _usageTimer?.cancel();
+    super.dispose();
   }
 
   bool                  get   hasInternetAccess             => _hasInternetAccess;
   CellularNetworkType   get   cellularNetworkType           => _cellularNetworkType;
   NetworkType           get   networkType                   => _networkType;
   int                   get   wirelessNetworkSignalLevel    => _wirelessNetworkSignalLevel;
+  int                 get   dailyWifiUsage                => _dailyWifiUsage;
+  bool                get   hasUsageStatsPermission       => _hasUsageStatsPermission;
 
   CellularNetworkType _getCellularNetworkType(int index)
   {

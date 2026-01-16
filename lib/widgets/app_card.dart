@@ -137,24 +137,41 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
                     ),
                   ),
                   Selector<SettingsService, bool>(
-                    selector: (_, settingsService) => settingsService.appHighlightAnimationEnabled && shouldHighlight,
-                    builder: (context, highlight, _) {
-                      if (highlight) {
-                        _animation.repeat(reverse: true);
-                        return AnimatedBuilder(
-                          animation: _animation,
-                          builder: (context, child) => IgnorePointer(
+                    selector: (_, settingsService) => settingsService.appHighlightAnimationEnabled,
+                    builder: (context, animationEnabled, _) {
+                      if (shouldHighlight) {
+                        if (animationEnabled) {
+                          // Animated border when animation is enabled
+                          _animation.repeat(reverse: true);
+                          return AnimatedBuilder(
+                            animation: _animation,
+                            builder: (context, child) => IgnorePointer(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: Colors.white.withAlpha(_animation.value.round()),
+                                    width: 3
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        } else {
+                          // Static border when animation is disabled
+                          _animation.stop();
+                          return IgnorePointer(
                             child: Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: Colors.white.withAlpha(_animation.value.round()),
+                                  color: Colors.white,
                                   width: 3
                                 ),
                               ),
                             ),
-                          ),
-                        );
+                          );
+                        }
                       }
 
                       _animation.stop();

@@ -48,3 +48,13 @@ app.*.map.json
 android/app/google-services.json
 android/app/upload-keystore.jks
 coverage/
+
+# Secrets
+*.jks
+*.keystore
+keystore.properties
+key.properties
+
+# Logs
+build_log.txt
+release_build_log.txt

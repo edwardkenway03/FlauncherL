@@ -33,7 +33,7 @@ class FLauncherAboutDialog extends StatelessWidget {
     AppLocalizations localizations = AppLocalizations.of(context)!;
 
     return AboutDialog(
-      applicationName: packageInfo.appName,
+      applicationName: "FlauncherL",
       applicationVersion: "${packageInfo.version} (${packageInfo.buildNumber})",
       applicationIcon: Image.asset("assets/logo.png", height: 72),
       applicationLegalese: "© 2024 Oscar Rojas",

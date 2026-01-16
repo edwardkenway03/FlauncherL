@@ -84,7 +84,14 @@ mixin FLauncherGradients {
     ),
   );
 
+  static final pitchBlack = FLauncherGradient(
+    "00000000-0000-0000-0000-000000000000",
+    "Pitch Black",
+    const LinearGradient(colors: [Color(0xFF000000), Color(0xFF000000)]),
+  );
+
   static List<FLauncherGradient> get all => [
+        pitchBlack,
         greatWhale,
         viciousStance,
         teenNotebook,

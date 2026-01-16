@@ -32,6 +32,13 @@ const _showCategoryTitles = "show_category_titles";
 const _showDateInStatusBar = "show_date_in_status_bar";
 const _showTimeInStatusBar = "show_time_in_status_bar";
 const _timeFormat = "time_format";
+const _wifiUsagePeriod = "wifi_usage_period";
+const _showWifiWidgetInStatusBar = "show_wifi_widget_in_status_bar";
+
+// WiFi usage period options
+const String WIFI_USAGE_DAILY = "daily";
+const String WIFI_USAGE_WEEKLY = "weekly";
+const String WIFI_USAGE_MONTHLY = "monthly";
 
 class SettingsService extends ChangeNotifier {
   static final defaultDateFormat = "EEEE d";
@@ -58,6 +65,10 @@ class SettingsService extends ChangeNotifier {
   String get dateFormat => _sharedPreferences.getString(_dateFormat) ?? defaultDateFormat;
 
   String get timeFormat => _sharedPreferences.getString(_timeFormat) ?? defaultTimeFormat;
+
+  String get wifiUsagePeriod => _sharedPreferences.getString(_wifiUsagePeriod) ?? WIFI_USAGE_DAILY;
+
+  bool get showWifiWidgetInStatusBar => _sharedPreferences.getBool(_showWifiWidgetInStatusBar) ?? true;
 
   SettingsService(
     this._sharedPreferences
@@ -108,5 +119,14 @@ class SettingsService extends ChangeNotifier {
 
   Future<void> setShowTimeInStatusBar(bool show) async {
     return set(_showTimeInStatusBar, show);
+  }
+
+  Future<void> setWifiUsagePeriod(String period) async {
+    await _sharedPreferences.setString(_wifiUsagePeriod, period);
+    notifyListeners();
+  }
+
+  Future<void> setShowWifiWidgetInStatusBar(bool show) async {
+    return set(_showWifiWidgetInStatusBar, show);
   }
 }

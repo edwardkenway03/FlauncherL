@@ -26,6 +26,7 @@ import 'package:flauncher/widgets/settings/flauncher_about_dialog.dart';
 import 'package:flauncher/widgets/settings/status_bar_panel_page.dart';
 import 'package:flauncher/widgets/settings/wallpaper_panel_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
@@ -105,6 +106,16 @@ class SettingsPanelPage extends StatelessWidget {
                     ),
                     onPressed: () => context.read<AppsService>().openSettings(),
                   ),
+                  TextButton(
+                    child: Row(
+                      children: [
+                        const Icon(Icons.screenshot_monitor),
+                        Container(width: 8),
+                        Text('Screensaver Settings', style: Theme.of(context).textTheme.bodyMedium),
+                      ],
+                    ),
+                    onPressed: () => _openScreensaverSettings(),
+                  ),
                   const Divider(),
                   TextButton(
                     child: Row(
@@ -125,6 +136,16 @@ class SettingsPanelPage extends StatelessWidget {
                       ],
                     ),
                     onPressed: () async => await _backButtonActionDialog(context),
+                  ),
+                  TextButton(
+                    child: Row(
+                      children: [
+                        const Icon(Icons.wifi),
+                        Container(width: 8),
+                        Text('WiFi Usage Period', style: Theme.of(context).textTheme.bodyMedium),
+                      ],
+                    ),
+                    onPressed: () async => await _wifiUsagePeriodDialog(context),
                   ),
                   RoundedSwitchListTile(
                     value: settingsService.appHighlightAnimationEnabled,
@@ -202,6 +223,56 @@ class SettingsPanelPage extends StatelessWidget {
     }
   }
 
+  Future<void> _wifiUsagePeriodDialog(BuildContext context) async {
+    SettingsService service = context.read<SettingsService>();
+    
+    final newPeriod = await showDialog<String>(
+        context: context,
+        builder: (context) => SimpleDialog(
+            title: Text('WiFi Usage Period'),
+            children: [
+              SimpleDialogOption(
+                child: Row(
+                  children: [
+                    if (service.wifiUsagePeriod == WIFI_USAGE_DAILY) Icon(Icons.check, size: 20),
+                    if (service.wifiUsagePeriod != WIFI_USAGE_DAILY) SizedBox(width: 20),
+                    SizedBox(width: 8),
+                    Text('Daily'),
+                  ],
+                ),
+                onPressed: () => Navigator.pop(context, WIFI_USAGE_DAILY),
+              ),
+              SimpleDialogOption(
+                child: Row(
+                  children: [
+                    if (service.wifiUsagePeriod == WIFI_USAGE_WEEKLY) Icon(Icons.check, size: 20),
+                    if (service.wifiUsagePeriod != WIFI_USAGE_WEEKLY) SizedBox(width: 20),
+                    SizedBox(width: 8),
+                    Text('Weekly'),
+                  ],
+                ),
+                onPressed: () => Navigator.pop(context, WIFI_USAGE_WEEKLY),
+              ),
+              SimpleDialogOption(
+                child: Row(
+                  children: [
+                    if (service.wifiUsagePeriod == WIFI_USAGE_MONTHLY) Icon(Icons.check, size: 20),
+                    if (service.wifiUsagePeriod != WIFI_USAGE_MONTHLY) SizedBox(width: 20),
+                    SizedBox(width: 8),
+                    Text('Monthly'),
+                  ],
+                ),
+                onPressed: () => Navigator.pop(context, WIFI_USAGE_MONTHLY),
+              ),
+            ]
+        )
+    );
+
+    if (newPeriod != null) {
+      await service.setWifiUsagePeriod(newPeriod);
+    }
+  }
+
   Future<void> _dateTimeFormatDialog(BuildContext context) async {
     SettingsService service = context.read<SettingsService>();
 
@@ -213,5 +284,12 @@ class SettingsPanelPage extends StatelessWidget {
     if (formatTuple != null) {
       await service.setDateTimeFormat(formatTuple.item1, formatTuple.item2);
     }
+  }
+
+  void _openScreensaverSettings() {
+    // Open Android screensaver settings
+    // This will show the system screensaver settings where FLauncher Clock can be selected
+    const platform = MethodChannel('me.efesser.flauncher/method');
+    platform.invokeMethod('openScreensaverSettings');
   }
 }

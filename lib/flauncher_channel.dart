@@ -63,6 +63,42 @@ class FLauncherChannel {
     return map.cast<String, dynamic>();
   }
 
+  Future<int> getDailyWifiUsage() async {
+    try {
+      final int usage = await _methodChannel.invokeMethod("getDailyWifiUsage");
+      return usage;
+    } on PlatformException catch (_) {
+      return -1;
+    }
+  }
+
+  Future<int> getWeeklyWifiUsage() async {
+    try {
+      final int usage = await _methodChannel.invokeMethod("getWeeklyWifiUsage");
+      return usage;
+    } on PlatformException catch (_) {
+      return -1;
+    }
+  }
+
+  Future<int> getMonthlyWifiUsage() async {
+    try {
+      final int usage = await _methodChannel.invokeMethod("getMonthlyWifiUsage");
+      return usage;
+    } on PlatformException catch (_) {
+      return -1;
+    }
+  }
+
+  Future<bool> checkUsageStatsPermission() async =>
+      await _methodChannel.invokeMethod("checkUsageStatsPermission");
+
+  Future<void> requestUsageStatsPermission() async =>
+      await _methodChannel.invokeMethod("requestUsageStatsPermission");
+
+  Future<void> openWifiSettings() async =>
+      await _methodChannel.invokeMethod("openWifiSettings");
+
   Future<void> startAmbientMode() async => await _methodChannel.invokeMethod("startAmbientMode");
 
   void addAppsChangedListener(void Function(Map<String, dynamic>) listener) =>

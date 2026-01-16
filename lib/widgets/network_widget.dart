@@ -11,6 +11,7 @@ class NetworkWidget extends StatelessWidget
     return Consumer<NetworkService>(
       builder: (context, networkService, _) {
         IconData iconData;
+        Color? iconColor;
 
         switch (networkService.networkType)
         {
@@ -56,17 +57,28 @@ class NetworkWidget extends StatelessWidget
             break;
           case NetworkType.Vpn: iconData = Icons.vpn_key; break;
           case NetworkType.Wired: iconData = Icons.lan; break;
-          case NetworkType.Unknown: iconData = Icons.link_off; break;
+          case NetworkType.Unknown: 
+            iconData = Icons.link_off;
+            iconColor = Colors.red; // Make no connection icon red
+            break;
         }
 
-        return Icon(iconData,
-          shadows: const [
-           Shadow(
-             color: Colors.black54,
-             offset: Offset(0, 2),
-             blurRadius: 8
-           )
-          ]
+        return InkWell(
+          onTap: () => networkService.openWifiSettings(),
+          borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Icon(iconData,
+              color: iconColor,
+              shadows: const [
+               Shadow(
+                 color: Colors.black54,
+                 offset: Offset(0, 2),
+                 blurRadius: 8
+               )
+              ]
+            ),
+          ),
         );
       }
     );

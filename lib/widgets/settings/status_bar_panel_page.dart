@@ -60,6 +60,12 @@ class StatusBarPanelPage extends StatelessWidget {
             title: Text(localizations.time),
             secondary: Icon(Icons.watch_later_outlined)
           ),
+          RoundedSwitchListTile(
+            value: settingsService.showWifiWidgetInStatusBar,
+            onChanged: (value) => settingsService.setShowWifiWidgetInStatusBar(value),
+            title: Text('WiFi Usage'),
+            secondary: Icon(Icons.wifi)
+          ),
         ],
       );
   }
