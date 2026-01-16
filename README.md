@@ -20,14 +20,12 @@ This customized version introduces usability enhancements and some UX improvemen
 
 ## Screenshots
 
-<table style="border: none;">
-  <tr>
-    <td align="center" style="border: none;"><img src="docs/images/screenshot_1.png" width="100%" alt="Home Screen"/></td>
-    <td align="center" style="border: none;"><img src="docs/images/screenshot_2.png" width="100%" alt="App Drawer"/></td>
-    <td align="center" style="border: none;"><img src="docs/images/screenshot_3.png" width="100%" alt="Settings"/></td>
-    <td align="center" style="border: none;"><img src="docs/images/screenshot_4.png" width="100%" alt="Wallpaper"/></td>
-  </tr>
-</table>
+<p float="left">
+  <img src="docs/images/screenshot_1.png" width="24%" alt="Home Screen"/>
+  <img src="docs/images/screenshot_2.png" width="24%" alt="Settings"/>
+  <img src="docs/images/screenshot_3.png" width="24%" alt="Widget"/>
+  <img src="docs/images/screenshot_4.png" width="24%" alt="Screensaver"/>
+</p>
 
 ## Original FLauncher Features
 
