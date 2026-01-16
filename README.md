@@ -6,6 +6,8 @@
   <img alt="FlauncherL Banner" src="assets/banner_light.svg">
 </picture>
 
+[![Download](https://img.shields.io/github/v/release/LeanBitLab/FlauncherL?label=Download&style=for-the-badge&color=7C4DFF)](https://github.com/LeanBitLab/FlauncherL/releases/latest)
+
 **FlauncherL** is a fork of [FLauncher](https://github.com/osrosal/flauncher) (originally by [etienn01](https://gitlab.com/flauncher/flauncher)) - an open-source alternative launcher for Android TV.
 
 This customized version introduces usability enhancements and some UX improvements by [LeanBitLab](https://github.com/LeanBitLab).
@@ -18,7 +20,6 @@ This customized version introduces usability enhancements and some UX improvemen
 - **🖼️ Minimal Wallpaper** - Added "Pitch Black" gradient (Default)
 - **💡 UX Improvements** - Visual indicator when highlight animation is disabled
 
-## Screenshots
 
 ## Screenshots
 
