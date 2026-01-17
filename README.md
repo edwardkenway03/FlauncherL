@@ -12,21 +12,19 @@
 
 This customized version introduces usability enhancements and some UX improvements by [LeanBitLab](https://github.com/LeanBitLab).
 
-## What's New in FlauncherL
+## Key Features & Enhancements
 
-### Latest (v2024.11.001)
-- **🎯 Widget Reorganization** - Network indicator merged with WiFi usage for cleaner status bar
-- **🎨 TV Remote-Friendly Date/Time Selector** - Preset format selection with 6 date + 5 time options (no keyboard needed!)
-- **🔧 Network Indicator Toggle** - Show/hide network status independently
-- **⚡ Major Optimizations** - Migrated to Dart 3 records, removed unused assets (~6MB saved), APK down to 29.7MB
-- **🐛 Bug Fixes** - Fixed date/time toggle duplication issue
+- **Data Usage Widget** - Track daily Internet consumption directly from the status bar.
+- **Inbuilt OLED Screensaver** - Minimal screensaver with 30s clock position shifting to prevent burn-in.
+- **Easy WiFi Access** - Network indicator doubles as a shortcut to system WiFi settings.
+- **Quick Presets** - Select Time/Date formats and Category names from a list (No keyboard required).
+- **Pitch Black Wallpaper** - Added a true black gradient background option.
+- **Easier D-Pad Navigation** - High-contrast focus outlines for better visibility on TV.
+- **New Categories** - Added "All Apps" and "Favorites" with auto-population support.
+- **UI Refinement** - Polished interface with cleaner typography and unified terminology.
+- **Optimizations** - Improved performance with aggressive icon caching and code cleanups.
 
-### Previous Features
-- **📊 Data Usage Widget** - Track WiFi usage with user-defined monitoring periods
-- **🌙 Minimal Screensaver** - Inbuilt OLED-friendly screensaver with smooth clock position shifting to prevent burn-in
-- **⚡ Simplified Network Access** - WiFi icon now redirects directly to system settings
-- **🖼️ Minimal Wallpaper** - Added "Pitch Black" gradient (Default)
-- **💡 UX Improvements** - Visual indicator when highlight animation is disabled
+
 
 
 ## Screenshots
