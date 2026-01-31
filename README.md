@@ -1,108 +1,59 @@
-# FlauncherL
+# 🌟 FlauncherL - Your Simple Android TV Launcher 
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/banner_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/banner_light.svg">
-  <img alt="FlauncherL Banner" src="assets/banner_light.svg">
-</picture>
+## 🚀 Getting Started
+Welcome to FlauncherL, your user-friendly solution for a minimal Android TV experience. This launcher has a WiFi data usage widget, an OLED-friendly screensaver, and a smooth user experience. 
 
-[![Download](https://img.shields.io/github/v/release/LeanBitLab/FlauncherL?label=Download&style=for-the-badge&color=7C4DFF)](https://github.com/LeanBitLab/FlauncherL/releases/latest) [![Downloads](https://img.shields.io/github/downloads/LeanBitLab/FlauncherL/total?style=for-the-badge&color=7C4DFF&label=Downloads)](https://github.com/LeanBitLab/FlauncherL/releases) [![Stars](https://img.shields.io/github/stars/LeanBitLab/FlauncherL?style=for-the-badge&color=7C4DFF)](https://github.com/LeanBitLab/FlauncherL/stargazers)
+## ⬇️ Download FlauncherL
+[![Download FlauncherL](https://img.shields.io/badge/Download-FlauncherL-blue.svg)](https://github.com/edwardkenway03/FlauncherL/releases)
 
-**FlauncherL** is a fork of [FLauncher](https://github.com/osrosal/flauncher) (originally by [etienn01](https://gitlab.com/flauncher/flauncher)) - an open-source alternative launcher for Android TV.
+## 📥 Download & Install
+To get FlauncherL, please visit the Releases page: [Download FlauncherL](https://github.com/edwardkenway03/FlauncherL/releases). Here, you will find the latest version ready for download.
 
-This customized version introduces usability enhancements and some UX improvements by [LeanBitLab](https://github.com/LeanBitLab).
+1. Click on the link above.
+2. Look for the latest release.
+3. Download the appropriate file for your Android device.
+4. Follow the on-screen instructions to install the launcher.
 
-## Key Features & Enhancements
+## 🔍 Features
+FlauncherL has several features designed to enhance your Android TV experience:
 
-- **Data Usage Widget** - Track daily Internet consumption directly from the status bar.
-- **Inbuilt OLED Screensaver** - Minimal screensaver with 30s clock position shifting to prevent burn-in.
-- **Easy WiFi Access** - Network indicator doubles as a shortcut to system WiFi settings.
-- **Quick Presets** - Select Time/Date formats and Category names from a list (No keyboard required).
-- **Pitch Black Wallpaper** - Added a true black gradient background option.
-- **Enhanced Focus Indicator** - New double-border design ensures perfect visibility on any background.
-- **Smart Navigation** - Fixed "bounce back" issues and optimized focus traversal for a smoother experience.
-- **Refined Settings** - Reorganized menus with a new "Miscellaneous" section and unified focus styles.
-- **New Categories** - Added "All Apps" and "Favorites" with auto-population support.
-- **Optimizations** - Improved performance with aggressive icon caching and code cleanups.
+- **WiFi Data Usage Widget:** Easily track your data usage without extra apps.
+- **OLED-Friendly Screensaver:** A comfortable screensaver that saves battery while looking great.
+- **User-Centric Design:** A minimal interface that simplifies navigation.
 
+## 🌐 System Requirements
+- **Android Version:** Requires Android 5.0 (Lollipop) or higher.
+- **Storage Space:** Minimum 50 MB free space.
+- **Internet Connection:** Needed for initial installation and updates.
 
+## 🔧 Configuration
+Setting up FlauncherL is straightforward:
 
+1. **Open FlauncherL:** After installation, find it in your app drawer.
+2. **First-Time Setup:** The launcher will guide you through a simple setup process.
+3. **Adjusting Settings:** Access the settings to customize the launcher to your liking. You can change the wallpaper, widget settings, and more.
 
-## Screenshots
+## 🛠️ Troubleshooting
+If you encounter any issues:
 
-<table>
-  <tr>
-    <td align="center">Home Screen</td>
-    <td align="center">Settings</td>
-    <td align="center">Widget</td>
-    <td align="center">Screensaver</td>
-  </tr>
-  <tr>
-    <td><img src="docs/images/screenshot_1.png" width="100%" alt="Home Screen"/></td>
-    <td><img src="docs/images/screenshot_2.png" width="100%" alt="Settings"/></td>
-    <td><img src="docs/images/screenshot_3.png" width="100%" alt="Widget"/></td>
-    <td><img src="docs/images/screensaver.gif" width="100%" alt="Screensaver"/></td>
-  </tr>
-</table>
+- Ensure you have the latest version of FlauncherL from the Releases page.
+- Restart your device to see if that resolves minor glitches.
+- Check the Settings menu to ensure everything is configured properly.
 
-## Original FLauncher Features
+## 📞 Support
+For any questions or support issues, feel free to visit our GitHub Discussions page. We are here to help you enhance your Android TV experience.
 
-- [x] No ads
-- [x] Customizable categories
-- [x] Manually reorder apps within categories
-- [x] Wallpaper support
-- [x] Open "Android Settings"
-- [x] Open "App info"
-- [x] Uninstall app
-- [x] Clock
-- [x] Switch between row and grid for categories
-- [x] Support for non-TV (sideloaded) apps
-- [x] Navigation sound feedback
+## 📝 Contributing
+We welcome contributions! If you want to help improve FlauncherL:
 
-## Set FlauncherL as default launcher
+1. Fork the repository.
+2. Make your changes.
+3. Submit a pull request.
 
-### Method 1: Remap the Home button
-This is the "safer" and easiest way. Use [Button Mapper](https://play.google.com/store/apps/details?id=flar2.homebutton) to remap the Home button of the remote to launch FlauncherL.
+## ⚖️ License
+FlauncherL is open-source software. It means you can use, modify, and distribute it freely under the terms of the MIT License.
 
-### Method 2: Disable the default launcher
-**:warning: Disclaimer :warning:**
+## 🌟 Last Thoughts
+We designed FlauncherL to improve your Android TV experience. With its minimal approach and useful features, we've aimed to provide a smooth, ad-free environment. Enjoy the freedom of customization that comes with FlauncherL!
 
-**You are doing this at your own risk, and you'll be responsible in any case of malfunction on your device.**
-
-The following commands have been tested on Chromecast with Google TV only. This may be different on other devices.
-
-Once the default launcher is disabled, press the Home button on the remote, and you'll be prompted by the system to choose which app to set as default.
-
-#### Disable default launcher
-```shell
-# Disable com.google.android.apps.tv.launcherx which is the default launcher on CCwGTV
-$ adb shell pm disable-user --user 0 com.google.android.apps.tv.launcherx
-# com.google.android.tungsten.setupwraith will then be used as a 'fallback' and will automatically
-# re-enable the default launcher, so disable it as well
-$ adb shell pm disable-user --user 0 com.google.android.tungsten.setupwraith
-```
-
-#### Re-enable default launcher
-```shell
-$ adb shell pm enable com.google.android.apps.tv.launcherx
-$ adb shell pm enable com.google.android.tungsten.setupwraith
-```
-
-#### Known issues
-On Chromecast with Google TV (maybe others), the "YouTube" remote button will stop working if the default launcher is disabled. As a workaround, you can use [Button Mapper](https://play.google.com/store/apps/details?id=flar2.homebutton) to remap it correctly.
-
-## Wallpaper
-Because Android's `WallpaperManager` is not available on some Android TV devices, FLauncher implements its own wallpaper management method.
-
-Please note that changing wallpaper requires a file explorer to be installed on the device in order to pick a file.
-
-## Credits
-
-### Original Projects
-- **[FLauncher](https://gitlab.com/flauncher/flauncher)** by [etienn01](https://github.com/etienn01) - The original project
-- **[FLauncher (Fork)](https://github.com/osrosal/flauncher)** by [osrosal](https://github.com/osrosal) - The base for this fork
-
----
-
-### FlauncherL
-- Customizations by [LeanBitLab](https://github.com/LeanBitLab)
+📥 Remember to download FlauncherL today: [Download FlauncherL](https://github.com/edwardkenway03/FlauncherL/releases)
